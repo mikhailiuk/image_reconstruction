@@ -1,32 +1,47 @@
 import tensorflow as tf
-
+import sys
+import imageio
 class Trainer:
-    def __init__(self):
-        self._batch_size = 64
-        self._learning_rate = 0.01
-        self._num_steps = 10000
-        self._display_step = 100
+    def __init__(self, net, batch_size, epoches):
+        self._net = net
+        self._batch_size = batch_size
+        self._num_steps = epoches
+        self._display_step = 1000
+        self._sess = tf.Session()
+        self._sess.run(tf.global_variables_initializer())
+        self._sess.run(tf.local_variables_initializer())
 
     def train(self, net, dataLoader): 
-        patches_reshaped, _ , _ = dataLoader.extract_image_patches()
-
+        patches_reshaped, _,_  = dataLoader.extract_image_patches()
         loss, optimiser = net.set_loss_optimiser()
-        with tf.Session() as sess:
-            sess.run(tf.global_variables_initializer())
-            sess.run(tf.local_variables_initializer())
-            for ii in range(1,self._num_steps+1):
-                for jj in range(0,(len(patches_reshaped)-self._batch_size),self._batch_size):
-                    end = jj+self._batch_size
-                    batch = patches_reshaped[jj:end,:]
-                    
-                    _, l = sess.run([optimiser, loss], feed_dict={net._X:batch})
 
-                if ii % self._display_step == 0 or ii == 1:
-                    print('Step %i: Minibatch Loss: %f' % (ii, l))
-
+        for epoch in range(1,self._num_steps+1):
+            count = 0
+            tottal_l = 0.0
+            for jj in range(0,(len(patches_reshaped)-self._batch_size),self._batch_size):
+                end = jj+self._batch_size
+                batch = patches_reshaped[jj:end,:]
+                _, l = self._sess.run([optimiser, loss], feed_dict={self._net._X:batch})
+                count=count+1
+                tottal_l = tottal_l+l
+            if epoch % self._display_step == 0 or epoch == 1:
+                
+                print('Step {}: Minibatch Loss: {}'.format(epoch, tottal_l/count))
+                
     def validate(self):
         pass
 
-    def test(self):
-        pass
-        #g = sess.run([decoder_op], feed_dict={X:patches_reshaped})
+    def test(self,net,dataLoader):
+        patches_reshaped, _ , _ = dataLoader.extract_image_patches()
+        g = self._sess.run([net._decoder_op], feed_dict={self._net._X:patches_reshaped})
+        return g
+
+    def plot_image(self,name, g, dataLoader ):
+        patches_new = g[0].reshape(int(dataLoader._image_dims[0]/dataLoader._patch_dims[0]*dataLoader._image_dims[1]/dataLoader._patch_dims[1]),
+                                   dataLoader._patch_dims[0],
+                                   dataLoader._patch_dims[1])*256
+        image = dataLoader.combine_image_patches(patches_new)
+        imageio.imsave(name+".png",im=image)
+
+    def close(self):
+        self._sess.close()

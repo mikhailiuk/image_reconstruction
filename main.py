@@ -36,17 +36,15 @@ if __name__ =="__main__":
     patch_dims = [16,16]
     image_dims = [512,512]
     input_units = patch_dims[0]* patch_dims[1]
-    learning_rate = 0.0001
+    learning_rate = 0.01
+    batch_size = 64
+    epoches = 50000
     dataLoader = DataLoader(patch_dims,image_dims)
-    trainer = Trainer()
-    patches, patch_dims, image_dims = dataLoader.extract_image_patches()
-
     net = Network(input_units,learning_rate)
+    trainer = Trainer(net,batch_size,epoches)
     trainer.train(net,dataLoader)
-    #g = trainer.test(net,dataLoader)
+    g = trainer.test(net,dataLoader)
+    trainer.plot_image("3",g,dataLoader)
+    trainer.close()
+    
 
-    #patches_new = g[0].reshape(int(image_dims[0]/patch_dims[0]*image_dims[1]/patch_dims[1]),
-    #                               patch_dims[0],
-    #                               patch_dims[1])*256
-    #image = dataLoader.combine_image_patches(patches_new)
-    #imageio.imsave("rec.png",im=image)

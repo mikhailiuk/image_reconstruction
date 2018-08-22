@@ -8,7 +8,7 @@ class DataLoader:
         self._patch_dims = patch_dims
         self._image_dims = image_dims
         self._image_area = self._image_dims[0]*self._image_dims[1]
-        self._patch_area = self._image_dims[0]*self._image_dims[1]
+        self._patch_area = self._patch_dims[0]*self._patch_dims[1]
         self._image= imageio.imread('./lena_gray.bmp')
         self._step = self._patch_dims
 
@@ -20,7 +20,9 @@ class DataLoader:
                 patches.append(patch)
 
         patches = np.asarray(patches)
-        patches_reshaped = patches.reshape(int(self._image_area/self._patch_area), self._patch_area)/256       
+        print(patches.shape)
+        patches_reshaped = patches.reshape(int(self._image_area/self._patch_area), self._patch_area)/256  
+        #print(patches_reshaped.shape)    
         return patches_reshaped, self._patch_dims, self._image_dims
 
     def combine_image_patches(self, patches):
