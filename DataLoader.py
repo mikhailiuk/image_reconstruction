@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import sys
 class DataLoader:
 
-    def __init__(self,patch_dims, image_dims):
+    def __init__(self,patch_dims, image_dims, steps):
         self._patch_dims = patch_dims
         self._image_dims = image_dims
         self._image_area = self._image_dims[0]*self._image_dims[1]
@@ -13,7 +13,7 @@ class DataLoader:
         self._image= imageio.imread('./data/0.bmp')
         self._merging_map = np.zeros(self._image_dims, dtype=float)
         self._numb_patches = 0
-        self._step = [64,64]#self._patch_dims #self._patch_dims
+        self._step = steps
 
     def extract_image_patches(self):
         patches = []
@@ -35,8 +35,7 @@ class DataLoader:
     def combine_image_patches(self, patches):
         image = np.zeros(self._image_dims, dtype=int)
         cnt = 0
-
-        patches= patches.reshape(int(self._numb_patches),self._patch_dims[0],self._patch_dims[1])*256
+        patches = patches.reshape(int(self._numb_patches),self._patch_dims[0],self._patch_dims[1])*256
         for ii in range(0,image.shape[0]-self._step[0],self._step[0]):
             for jj in range(0,image.shape[1]-self._step[1],self._step[1]):
                 jj_end = (jj+self._patch_dims[1])

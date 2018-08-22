@@ -35,12 +35,14 @@ if __name__ =="__main__":
 
     patch_dims = [128,128]
     image_dims = [512,512]
+
+    steps=[64,64]
     input_units = patch_dims[0]* patch_dims[1]
     learning_rate = 0.01
     batch_size = 32
     epoches = 50000
     hiddent_units = 64
-    dataLoader = DataLoader(patch_dims,image_dims)
+    dataLoader = DataLoader(patch_dims,image_dims,steps)
     net = Network(input_units,learning_rate,hiddent_units)
     trainer = Trainer(net,batch_size,epoches)
     trainer.train(net,dataLoader)
