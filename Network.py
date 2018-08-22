@@ -1,9 +1,9 @@
 import tensorflow as tf
 
 class Network:
-    def __init__(self, input_units, learing_rate):
+    def __init__(self, input_units, learing_rate, hidden_units):
         self._input_units=input_units 
-        self._hidden_units = 128
+        self._hidden_units = hidden_units
         self._learning_rate = learing_rate
         self._weights = {
             'encoder':tf.Variable(tf.random_normal([self._input_units, self._hidden_units],mean = 0.0, stddev=0.02)),
