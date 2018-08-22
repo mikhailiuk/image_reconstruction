@@ -33,7 +33,7 @@ i.e. decrease the magnitude of input inversly proportional to the increase in da
 
 if __name__ =="__main__":
 
-    patch_dims = [8,8]
+    patch_dims = [128,128]
     image_dims = [512,512]
     input_units = patch_dims[0]* patch_dims[1]
     learning_rate = 0.01

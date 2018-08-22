@@ -27,7 +27,7 @@ class Trainer:
             if epoch % self._display_step == 0 or epoch == 1:
                 
                 print('Step {}: Minibatch Loss: {}'.format(epoch, tottal_l/count))
-                
+
     def validate(self):
         pass
 
@@ -37,10 +37,7 @@ class Trainer:
         return g
 
     def plot_image(self,name, g, dataLoader ):
-        patches_new = g[0].reshape(int(dataLoader._image_dims[0]/dataLoader._patch_dims[0]*dataLoader._image_dims[1]/dataLoader._patch_dims[1]),
-                                   dataLoader._patch_dims[0],
-                                   dataLoader._patch_dims[1])*256
-        image = dataLoader.combine_image_patches(patches_new)
+        image = dataLoader.combine_image_patches(g[0])
         imageio.imsave(name+".png",im=image)
 
     def close(self):
