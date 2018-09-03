@@ -17,15 +17,15 @@ deactivate
 
 
 TODO:
-1) Test whether it works
-2) Loss and optimiser - proerties of trainer or of the network
++1) Test whether it works
++2) Loss and optimiser - proerties of trainer or of the network
 3) Noise mask
 4) Validation mask
 5) Test mask
 6) Multiple images
 7) Better way of loading train and test images (see pytorch)
 8) Track progress
-9) Overlapping patches
++9) Overlapping patches
 10) When testing make sure that account for the fact that less informtaion is fed, 
 i.e. decrease the magnitude of input inversly proportional to the increase in data information
 '''
@@ -33,20 +33,19 @@ i.e. decrease the magnitude of input inversly proportional to the increase in da
 
 if __name__ =="__main__":
 
-    patch_dims = [128,128]
+    patch_dims = [16,16]
     image_dims = [512,512]
-
-    steps=[64,64]
-    input_units = patch_dims[0]* patch_dims[1]
-    learning_rate = 0.01
+    steps = [2,2]
+    input_units = patch_dims[0]*patch_dims[1]
+    learning_rate = 0.05
     batch_size = 32
-    epoches = 50000
-    hiddent_units = 64
-    dataLoader = DataLoader(patch_dims,image_dims,steps)
+    epoches = 20000
+    hiddent_units = 32
+    dataLoader = DataLoader(patch_dims,image_dims,batch_size,steps)
     net = Network(input_units,learning_rate,hiddent_units)
     trainer = Trainer(net,batch_size,epoches)
-    trainer.train(net,dataLoader)
-    g = trainer.test(net,dataLoader)
+    trainer.train(dataLoader)
+    g = trainer.test(dataLoader)
     trainer.plot_image("3",g,dataLoader)
     trainer.close()
     
