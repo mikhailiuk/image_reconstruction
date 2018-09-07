@@ -106,7 +106,7 @@ class DataLoader:
         '''
         np.random.shuffle(self._ordered_arr)
 
-    def combine_and_save_image_patches(self, patches):
+    def combine_and_save_image_patches(self, patches, comment):
         '''
         Function to combine reconstructed patches into an image
         '''
@@ -145,7 +145,7 @@ class DataLoader:
                     image_new[ii:ii_end,jj:jj_end] = np.multiply(image_new[ii:ii_end,jj:jj_end], (1 - msk_tr[cnt]))+np.multiply(image[ii:ii_end, jj:jj_end], msk_tr[cnt])
                     cnt = cnt+1
             #imageio.imsave(name+str(kk)+".png",im=self._merging_map[kk,:,:])
-            imageio.imsave('./data/reconstructed/'+name+".png",im=image_new)
+            imageio.imsave('./data/reconstructed/'+comment+'_'+name+".png",im=image_new)
 
         t1 = time.time()
         print("Images are saved. Time taken: {} s".format(t1-t0))

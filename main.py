@@ -40,8 +40,8 @@ if __name__ =="__main__":
     learning_rate = 0.1
     batch_size = 32
     epoches = 100
-    validation_step = 2
-    hiddent_units = 32
+    validation_step = 1
+    hiddent_units = 16
     
     # Create dataloader
     dataLoader = DataLoader(patch_dims,image_dims,batch_size,steps)
@@ -56,9 +56,9 @@ if __name__ =="__main__":
     trainer.train(dataLoader)
 
     # Test the network and save the image
-    g = trainer.test(dataLoader)
+    g_best = trainer.test(dataLoader)
 
-    dataLoader.combine_and_save_image_patches(g[0])
+    dataLoader.combine_and_save_image_patches(g_best[0], 'best')
 
     # Close the tensorflow session opened in trainer
     trainer.close()

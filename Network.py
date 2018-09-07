@@ -24,6 +24,10 @@ class Network:
             'decoder':tf.Variable(tf.random_normal([self._input_units],mean = 0.0, stddev=0.02))
         }
 
+        self._best_weights  = self._weights
+        self._best_biases = self._biases
+
+
         # Flag to distinguish between training and validation sessions
         self._train_flag = tf.placeholder("bool")
         # Train mask
@@ -62,6 +66,16 @@ class Network:
         # Loss is computed only for the validation mask
         loss_val = tf.divide(tf.reduce_sum(tf.pow(tf.multiply((y_pred-y_true),(1-self._mask_val)), 2)),tf.reduce_sum(1-self._mask_val))
         return loss_val
+
+
+    def save_best(self):
+        self._best_weights  = self._weights
+        self._best_biases = self._biases
+
+
+    def set_best_weights(self):
+        self._weights  = self._best_weights
+        self._biases = self._best_biases
 
     def encoder(self, x):
         # Operation of the encoder (path through the tanh activation)

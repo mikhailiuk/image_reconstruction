@@ -32,8 +32,6 @@ class Trainer:
         self._epoches = epoches
         # Calculate and display validation error every 100 steps
         self._validation_step = validation_step
-        # Save the best model 
-        self._best_model = net
         # Minimum validation error - required for finding the best model 
         self._min_error = 99999999999.9
 
@@ -84,7 +82,12 @@ class Trainer:
             # If the first or the display step then validate the network
             if epoch % self._validation_step == 0 or epoch == 1:
                 self.validate(dataLoader,epoch)
-            
+
+
+        self._net.set_best_weights()  
+
+        return self._net
+
     def validate(self,dataLoader,epoch):
         '''
         Validation function
@@ -107,7 +110,7 @@ class Trainer:
             # Set min error to current error
             self._min_error = loss_batch[0]
             # Set new best model
-            self._best_model = copy.copy(self._net)
+            self._net.save_best()
 
         self._validation_error.append(loss_batch[0])
 
@@ -119,13 +122,14 @@ class Trainer:
         '''
         Test function
         '''
-        # To test - feed all patches and get only the output of the network decoder
-        g = self._sess.run([self._best_model._decoder_op], feed_dict={self._best_model._X:dataLoader._ptchs,
-                                                         self._best_model._mask_train:dataLoader._ptchs_msk_tr,
-                                                         self._best_model._mask_val:dataLoader._ptchs_msk_vl,
-                                                         self._best_model._train_flag:True})
-        return g
 
+
+        # To test - feed all patches and get only the output of the network decoder
+        g = self._sess.run([self._net._decoder_op], feed_dict={self._net._X:dataLoader._ptchs,
+                                                         self._net._mask_train:dataLoader._ptchs_msk_tr,
+                                                         self._net._mask_val:dataLoader._ptchs_msk_vl,
+                                                         self._net._train_flag:True})
+        return g
 
 
     def close(self):
