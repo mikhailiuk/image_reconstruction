@@ -1,6 +1,17 @@
 import tensorflow as tf
 import sys
 import imageio
+import matplotlib.pyplot as plt
+
+def error_plotting(xlim, error):
+    plt.cla()
+    plt.xlim(0, xlim)
+    plt.plot(error)
+    plt.xlabel("Batch")
+    plt.ylabel("Validation error")
+    plt.pause(0.00001)
+
+
 class Trainer:
     '''
     Class to perform training, validation and testing. It build with tensorflow
@@ -8,7 +19,7 @@ class Trainer:
     session must be closed with close() method.
     '''
 
-    def __init__(self, net, batch_size, epoches):
+    def __init__(self, net, batch_size, epoches,validation_step):
         '''
         Initialise the trainer
         '''
@@ -18,18 +29,20 @@ class Trainer:
         # Set batch
         self._batch_size = batch_size
         # Set number of epoches
-        self._num_steps = epoches
+        self._epoches = epoches
         # Calculate and display validation error every 100 steps
-        self._display_step = 10
+        self._validation_step = validation_step
         # Save the best model 
         self._best_model = net
         # Minimum validation error - required for finding the best model 
         self._min_error = 99999999999.9
 
+        self._validation_error = []
         # Create tensorflow session and initialise graph and variables
         self._sess = tf.Session()
         self._sess.run(tf.global_variables_initializer())
         self._sess.run(tf.local_variables_initializer())
+        
 
     def train(self, dataLoader): 
         '''
@@ -42,7 +55,7 @@ class Trainer:
         loss, optimiser  = self._net.set_loss_optimiser()
 
         # Iterate over epochs
-        for epoch in range(1,self._num_steps+1):
+        for epoch in range(1,self._epoches+1):
             count = 0
             tottal_l = 0.0
             
@@ -69,7 +82,7 @@ class Trainer:
             dataLoader.shuffle_order()
             
             # If the first or the display step then validate the network
-            if epoch % self._display_step == 0 or epoch == 1:
+            if epoch % self._validation_step == 0 or epoch == 1:
                 self.validate(dataLoader,epoch)
             
     def validate(self,dataLoader,epoch):
@@ -96,7 +109,10 @@ class Trainer:
             # Set new best model
             self._best_model = self._net
 
-        print('Step {}: Minibatch Loss: {}'.format(epoch,loss_batch[0]))
+        self._validation_error.append(loss_batch[0])
+
+        error_plotting( int(self._epoches/self._validation_step)+1, self._validation_error)
+        print('Epoch {}: validation loss: {}'.format(epoch,loss_batch[0]))
 
 
     def test(self,dataLoader):

@@ -33,13 +33,14 @@ i.e. decrease the magnitude of input inversly proportional to the increase in da
 
 if __name__ =="__main__":
     # Set parameters
-    patch_dims = [16,16]
+    patch_dims = [8,8]
     image_dims = [512,512]
-    steps = [1,1]
+    steps = [2,2]
     input_units = patch_dims[0]*patch_dims[1]
     learning_rate = 0.05
     batch_size = 32
-    epoches = 10
+    epoches = 1000
+    validation_step = 1
     hiddent_units = 128
     
     # Create dataloader
@@ -49,7 +50,7 @@ if __name__ =="__main__":
     net = Network(input_units,learning_rate,hiddent_units)
     
     # Create trainer
-    trainer = Trainer(net,batch_size,epoches)
+    trainer = Trainer(net,batch_size,epoches,validation_step)
     
     # Train the network
     trainer.train(dataLoader)

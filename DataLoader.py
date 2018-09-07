@@ -110,8 +110,8 @@ class DataLoader:
         '''
         Function to combine reconstructed patches into an image
         '''
-        print("Saving patches")
-
+        print("Saving reconstructed images")
+        t0 = time.time()
         cnt = 0
         for kk in range (0,len(self._dataset)):
             image = imageio.imread('./data/images/'+self._dataset['image_noisy'][kk]+'.bmp')
@@ -145,6 +145,9 @@ class DataLoader:
                     cnt = cnt+1
             #imageio.imsave(name+str(kk)+".png",im=self._merging_map[kk,:,:])
             imageio.imsave('./data/reconstructed/'+name+".png",im=image_new)
+
+        t1 = time.time()
+        print("Images are saved. Time taken: {} s".format(t1-t0))
         return 
 
     def __iter__(self):
