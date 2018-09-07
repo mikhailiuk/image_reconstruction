@@ -2,7 +2,9 @@ import tensorflow as tf
 import numpy as np
 import imageio
 import matplotlib.pyplot as plt
+import pandas as pd
 import sys
+import time
 
 
 class DataLoader:
@@ -21,9 +23,7 @@ class DataLoader:
         self._image_area = self._image_dims[0]*self._image_dims[1]
         self._patch_area = self._patch_dims[0]*self._patch_dims[1]
         # Set the image and patches
-        self._image= imageio.imread('./data/0_noisy.bmp')
-        self._mask_train = np.load('./data/0_train_mask.npy')
-        self._mask_val = np.load('./data/0_val_mask.npy')
+        self._dataset = pd.read_csv('dataset.csv')
         # Need map with weights to combine image together if use overlapping patches 
         self._merging_map = np.zeros(self._image_dims, dtype=float)
         # Order in whitch patches are fed to the network
@@ -47,30 +47,40 @@ class DataLoader:
         Function to extract image patches
         '''
 
+
+        print("Extracting patches")
+        t0 = time.time()
         # Create initial lists to hold patches
         patches = []
         mask_patches_train = []
         mask_patches_val = []
-        # Create numpy array for the merging map
-        self._merging_map = np.zeros(self._image_dims, dtype=float)
 
-        # Iterate over the first dimension of the image with an x-step
-        for ii in range(0,self._image.shape[0]-self._patch_dims[0],self._step[0]):
-            # Ending index for the current patch extracted from the first fimensions
-            ii_end = (ii+self._patch_dims[0])
-            # Iterate over the second dimension of the image with an x-step
-            for jj in range(0,self._image.shape[1]-self._patch_dims[1],self._step[1]):
-                
-                # Ending index for the current patch extracted from the second fimensions
-                jj_end = (jj+self._patch_dims[1])
+        # Create numpy array for the merging map - separate for every image
+        self._merging_map = np.zeros((len(self._dataset),self._image_dims[0],self._image_dims[1]), dtype=float)
 
-                # Append extracted patches from the image and noise masks to their
-                # lists
-                patches.append((self._image[ii:ii_end,jj:jj_end]).tolist())
-                mask_patches_train.append((self._mask_train[ii:ii_end,jj:jj_end]).tolist())
-                mask_patches_val.append((self._mask_val[ii:ii_end,jj:jj_end]).tolist())
-                self._merging_map[ii:ii_end, jj:jj_end] += 1.0
-                self._len_dataset +=1
+        for kk in range (0,len(self._dataset)):
+            image= imageio.imread('./data/images/'+self._dataset['image_noisy'][kk]+'.bmp')
+            mask_train = np.load('./data/masks_train/'+self._dataset['mask_train'][kk]+'.npy')
+            mask_validation = np.load('./data/masks_validation/'+self._dataset['mask_validation'][kk]+'.npy')
+
+            # Iterate over the first dimension of the image with an x-step
+            for ii in range(0,image.shape[0]-self._patch_dims[0],self._step[0]):
+                # Ending index for the current patch extracted from the first fimensions
+                ii_end = (ii+self._patch_dims[0])
+                # Iterate over the second dimension of the image with an x-step
+                for jj in range(0,image.shape[1]-self._patch_dims[1],self._step[1]):
+                    
+                    # Ending index for the current patch extracted from the second fimensions
+                    jj_end = (jj+self._patch_dims[1])
+
+                    # Append extracted patches from the image and noise masks to their
+                    # lists
+                    patches.append((image[ii:ii_end,jj:jj_end]).tolist())
+                    mask_patches_train.append((mask_train[ii:ii_end,jj:jj_end]).tolist())
+                    mask_patches_val.append((mask_validation[ii:ii_end,jj:jj_end]).tolist())
+                    self._merging_map[kk, ii:ii_end, jj:jj_end] += 1.0
+                    self._len_dataset +=1
+
 
         # Convert lists to arrays        
         patches = np.asarray(patches)
@@ -85,44 +95,57 @@ class DataLoader:
         self._ptchs_msk_tr = patches_mask_train.reshape(int(self._len_dataset), self._patch_area)
         self._ptchs_msk_vl = patches_mask_val.reshape(int(self._len_dataset), self._patch_area)
 
+        t1 = time.time()
+        print("{} patches are exctracted. Time taken: {} s".format(int(self._len_dataset),t1-t0))
+
         return self._ptchs,self._ptchs_msk_tr, self._ptchs_msk_vl, self._patch_dims, self._image_dims
 
     def shuffle_order (self):
         '''
         Function to shuffle the data
         '''
+        np.random.shuffle(self._ordered_arr)
 
-        self._ordered_arr = np.random.shuffle(self._ordered_arr)
-
-    def combine_image_patches(self, patches):
+    def combine_and_save_image_patches(self, patches):
         '''
         Function to combine reconstructed patches into an image
         '''
+        print("Saving patches")
 
-        # Image to fill
-        image = np.zeros(self._image_dims, dtype=int)
         cnt = 0
-        # Reshpe and rescale patches
-        patches = patches.reshape(int(self._len_dataset),self._patch_dims[0],self._patch_dims[1])*256
+        for kk in range (0,len(self._dataset)):
+            image = imageio.imread('./data/images/'+self._dataset['image_noisy'][kk]+'.bmp')
+            name = str(kk)+'_reconstructed'
 
-        # Go over the first image dimension with a step
-        for ii in range(0,image.shape[0]-self._patch_dims[0],self._step[0]):
+            # Image to fill
+            image_new = np.zeros(image.shape, dtype=int)
             
-            # End index in the first dimension
-            ii_end = (ii+self._patch_dims[0])
+            # Reshpe and rescale patches
+            patches = np.maximum(np.minimum(np.rint(patches.reshape(int(self._len_dataset),self._patch_dims[0],self._patch_dims[1])*256),256),0)
+            msk_tr = self._ptchs_msk_tr.reshape(int(self._len_dataset),self._patch_dims[0],self._patch_dims[1])
 
-            # Go over the second dimension 
-            for jj in range(0,image.shape[1]-self._patch_dims[1],self._step[1]):
+            # Go over the first image dimension with a step
+            for ii in range(0,image.shape[0]-self._patch_dims[0],self._step[0]):
+                
+                # End index in the first dimension
+                ii_end = (ii+self._patch_dims[0])
 
-                # End index in the second dimension
-                jj_end = (jj+self._patch_dims[1])
-                image[ii:ii_end,jj:jj_end] = image[ii:ii_end,jj:jj_end] + np.divide((( np.maximum(
-                    np.minimum(np.rint(patches[cnt]),256),0))),(self._merging_map[ii:ii_end, jj:jj_end]))
-                image[ii:ii_end,jj:jj_end] = np.multiply(image[ii:ii_end,jj:jj_end],
-                                            (1 - self._mask_train[ii:ii_end,jj:jj_end]))+np.multiply(self._image[ii:ii_end,jj:jj_end],self._mask_train[ii:ii_end,jj:jj_end])
-                cnt = cnt+1
+                # Go over the second dimension 
+                for jj in range(0,image.shape[1]-self._patch_dims[1],self._step[1]):
 
-        return image
+                    im_ptch = np.zeros(self._patch_dims,dtype=int)
+
+                    # End index in the second dimension
+                    jj_end = jj+self._patch_dims[1]
+
+                    im_ptch = im_ptch + np.divide(patches[cnt], self._merging_map[kk, ii:ii_end, jj:jj_end])
+
+                    # Only insert reconstructed (missing before values)
+                    image_new[ii:ii_end,jj:jj_end] = np.multiply(im_ptch, (1 - msk_tr[cnt]))+np.multiply(image[ii:ii_end, jj:jj_end], msk_tr[cnt])
+                    cnt = cnt+1
+            #imageio.imsave(name+str(kk)+".png",im=self._merging_map[kk,:,:])
+            imageio.imsave('./data/reconstructed/'+name+".png",im=image_new)
+        return 
 
     def __iter__(self):
         '''

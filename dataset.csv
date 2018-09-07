@@ -1,0 +1,3 @@
+image_noisy,mask_train,mask_validation
+0_noisy,0_train_mask,0_val_mask
+1_noisy,1_train_mask,1_val_mask

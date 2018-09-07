@@ -35,11 +35,11 @@ if __name__ =="__main__":
     # Set parameters
     patch_dims = [16,16]
     image_dims = [512,512]
-    steps = [2,2]
+    steps = [1,1]
     input_units = patch_dims[0]*patch_dims[1]
     learning_rate = 0.05
     batch_size = 32
-    epoches = 20000
+    epoches = 10
     hiddent_units = 128
     
     # Create dataloader
@@ -56,7 +56,9 @@ if __name__ =="__main__":
 
     # Test the network and save the image
     g = trainer.test(dataLoader)
-    trainer.plot_image("3",g,dataLoader)
+    
+    dataLoader.combine_and_save_image_patches(g[0])
+
     
     # Close the tensorflow session opened in trainer
     trainer.close()

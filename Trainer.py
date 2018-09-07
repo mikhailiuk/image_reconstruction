@@ -20,7 +20,7 @@ class Trainer:
         # Set number of epoches
         self._num_steps = epoches
         # Calculate and display validation error every 100 steps
-        self._display_step = 100
+        self._display_step = 10
         # Save the best model 
         self._best_model = net
         # Minimum validation error - required for finding the best model 
@@ -66,7 +66,7 @@ class Trainer:
                 tottal_l = tottal_l+loss_batch
 
             # Shuffle the dataset
-            #dataLoader.shuffle_order()
+            dataLoader.shuffle_order()
             
             # If the first or the display step then validate the network
             if epoch % self._display_step == 0 or epoch == 1:
@@ -110,13 +110,7 @@ class Trainer:
                                                          self._best_model._train_flag:True})
         return g
 
-    def plot_image(self,name, g, dataLoader ):
-        '''
-        Function to save the image
-        '''
-        
-        image = dataLoader.combine_image_patches(g[0])
-        imageio.imsave(name+".png",im=image)
+
 
     def close(self):
         '''
