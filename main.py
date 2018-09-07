@@ -39,7 +39,7 @@ if __name__ =="__main__":
     input_units = patch_dims[0]*patch_dims[1]
     learning_rate = 0.1
     batch_size = 32
-    epoches = 100
+    epoches = 30
     validation_step = 1
     hiddent_units = 16
     
