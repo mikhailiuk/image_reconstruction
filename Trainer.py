@@ -3,7 +3,6 @@ import sys
 import imageio
 import matplotlib.pyplot as plt
 import copy
-
 def error_plotting(xlim, error):
     plt.cla()
     plt.xlim(0, xlim)
