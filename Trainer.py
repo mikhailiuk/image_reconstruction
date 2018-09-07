@@ -2,6 +2,7 @@ import tensorflow as tf
 import sys
 import imageio
 import matplotlib.pyplot as plt
+import copy
 
 def error_plotting(xlim, error):
     plt.cla()
@@ -107,7 +108,7 @@ class Trainer:
             # Set min error to current error
             self._min_error = loss_batch[0]
             # Set new best model
-            self._best_model = self._net
+            self._best_model = copy.copy(self._net)
 
         self._validation_error.append(loss_batch[0])
 

@@ -33,7 +33,7 @@ i.e. decrease the magnitude of input inversly proportional to the increase in da
 
 if __name__ =="__main__":
     # Set parameters
-    patch_dims = [8,8]
+    patch_dims = [16,16]
     image_dims = [512,512]
     steps = [2,2]
     input_units = patch_dims[0]*patch_dims[1]
@@ -41,26 +41,25 @@ if __name__ =="__main__":
     batch_size = 32
     epoches = 1000
     validation_step = 2
-    hiddent_units = 32
+    hiddent_units = 128
     
     # Create dataloader
     dataLoader = DataLoader(patch_dims,image_dims,batch_size,steps)
     
     # Create network
     net = Network(input_units,learning_rate,hiddent_units)
-    
+
     # Create trainer
     trainer = Trainer(net,batch_size,epoches,validation_step)
-    
+
     # Train the network
     trainer.train(dataLoader)
 
     # Test the network and save the image
     g = trainer.test(dataLoader)
-    
+
     dataLoader.combine_and_save_image_patches(g[0])
 
-    
     # Close the tensorflow session opened in trainer
     trainer.close()
     

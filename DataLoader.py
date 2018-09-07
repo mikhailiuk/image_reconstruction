@@ -110,6 +110,13 @@ class DataLoader:
         '''
         Function to combine reconstructed patches into an image
         '''
+
+
+        # Reshpe and rescale patches
+
+        msk_tr = self._ptchs_msk_tr.reshape(int(self._len_dataset),self._patch_dims[0],self._patch_dims[1])
+        patches = np.maximum(np.minimum(np.rint(patches.reshape(int(self._len_dataset),self._patch_dims[0],self._patch_dims[1])*256),256),0)
+        
         print("Saving reconstructed images")
         t0 = time.time()
         cnt = 0
@@ -120,9 +127,7 @@ class DataLoader:
             # Image to fill
             image_new = np.zeros(image.shape, dtype=int)
             
-            # Reshpe and rescale patches
-            patches = np.maximum(np.minimum(np.rint(patches.reshape(int(self._len_dataset),self._patch_dims[0],self._patch_dims[1])*256),256),0)
-            msk_tr = self._ptchs_msk_tr.reshape(int(self._len_dataset),self._patch_dims[0],self._patch_dims[1])
+
 
             # Go over the first image dimension with a step
             for ii in range(0,image.shape[0]-self._patch_dims[0],self._step[0]):
