@@ -37,11 +37,11 @@ if __name__ =="__main__":
     image_dims = [512,512]
     steps = [2,2]
     input_units = patch_dims[0]*patch_dims[1]
-    learning_rate = 0.05
+    learning_rate = 0.01
     batch_size = 32
     epoches = 1000
-    validation_step = 1
-    hiddent_units = 128
+    validation_step = 2
+    hiddent_units = 32
     
     # Create dataloader
     dataLoader = DataLoader(patch_dims,image_dims,batch_size,steps)
