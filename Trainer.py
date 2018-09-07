@@ -1,15 +1,7 @@
 import tensorflow as tf
 import sys
 import imageio
-import matplotlib.pyplot as plt
 import copy
-def error_plotting(xlim, error):
-    plt.cla()
-    plt.xlim(0, xlim)
-    plt.plot(error)
-    plt.xlabel("Batch")
-    plt.ylabel("Validation error")
-    plt.pause(0.00001)
 
 
 class Trainer:
@@ -114,7 +106,6 @@ class Trainer:
 
         self._validation_error.append(loss_batch[0])
 
-        error_plotting( int(self._epoches/self._validation_step)+1, self._validation_error)
         print('Epoch {}: validation loss: {}'.format(epoch,loss_batch[0]))
 
 

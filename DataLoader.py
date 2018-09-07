@@ -1,7 +1,6 @@
 import tensorflow as tf
 import numpy as np
 import imageio
-import matplotlib.pyplot as plt
 import pandas as pd
 import sys
 import time
@@ -59,7 +58,7 @@ class DataLoader:
         self._merging_map = np.zeros((len(self._dataset),self._image_dims[0],self._image_dims[1]), dtype=float)
 
         for kk in range (0,len(self._dataset)):
-            image= imageio.imread('./data/images/'+self._dataset['image_noisy'][kk]+'.bmp')
+            image= imageio.imread('./data/noisy_images/'+self._dataset['image_noisy'][kk]+'.bmp')
             mask_train = np.load('./data/masks_train/'+self._dataset['mask_train'][kk]+'.npy')
             mask_validation = np.load('./data/masks_validation/'+self._dataset['mask_validation'][kk]+'.npy')
 
@@ -91,7 +90,7 @@ class DataLoader:
         self._ordered_arr = np.arange(self._len_dataset)
 
         # Reshape np arrays with data and scale the image between 0 and 1
-        self._ptchs = patches.reshape(int(self._len_dataset), self._patch_area)/256.0
+        self._ptchs = patches.reshape(int(self._len_dataset), self._patch_area)/255.0
         self._ptchs_msk_tr = patches_mask_train.reshape(int(self._len_dataset), self._patch_area)
         self._ptchs_msk_vl = patches_mask_val.reshape(int(self._len_dataset), self._patch_area)
 
@@ -113,25 +112,23 @@ class DataLoader:
 
 
         # Reshpe and rescale patches
+        patches = patches.reshape(int(self._len_dataset),self._patch_dims[0],self._patch_dims[1])
 
-        msk_tr = self._ptchs_msk_tr.reshape(int(self._len_dataset),self._patch_dims[0],self._patch_dims[1])
-        patches = np.maximum(np.minimum(np.rint(patches.reshape(int(self._len_dataset),self._patch_dims[0],self._patch_dims[1])*256),256),0)
-        
         print("Saving reconstructed images")
         t0 = time.time()
         cnt = 0
         for kk in range (0,len(self._dataset)):
-            image = imageio.imread('./data/images/'+self._dataset['image_noisy'][kk]+'.bmp')
-            name = str(kk)+'_reconstructed'
-
+            image = imageio.imread('./data/noisy_images/'+self._dataset['image_noisy'][kk]+'.bmp')
+            name = self._dataset['image_noisy'][kk]+'_reconstructed'
+            mask_train = np.load('./data/masks_train/'+self._dataset['mask_train'][kk]+'.npy')
             # Image to fill
-            image_new = np.zeros(image.shape, dtype=int)
+            image_new = np.zeros(image.shape, dtype=float)
 
             # Go over the first image dimension with a step
             for ii in range(0,image.shape[0]-self._patch_dims[0]+1,self._step[0]):
                 
                 # End index in the first dimension
-                ii_end = (ii+self._patch_dims[0])
+                ii_end = ii+self._patch_dims[0]
 
                 # Go over the second dimension 
                 for jj in range(0,image.shape[1]-self._patch_dims[1]+1,self._step[1]):
@@ -139,12 +136,14 @@ class DataLoader:
                     # End index in the second dimension
                     jj_end = jj+self._patch_dims[1]
 
-                    image_new[ii:ii_end,jj:jj_end] = image_new[ii:ii_end,jj:jj_end] + np.divide(patches[cnt], self._merging_map[kk, ii:ii_end, jj:jj_end])
-
-                    # Only insert reconstructed (missing before values)
-                    image_new[ii:ii_end,jj:jj_end] = np.multiply(image_new[ii:ii_end,jj:jj_end], (1 - msk_tr[cnt]))+np.multiply(image[ii:ii_end, jj:jj_end], msk_tr[cnt])
+                    image_new[ii:ii_end,jj:jj_end] = image_new[ii:ii_end,jj:jj_end] + patches[cnt]
+    
                     cnt = cnt+1
-            #imageio.imsave(name+str(kk)+".png",im=self._merging_map[kk,:,:])
+ 
+            image_new = np.rint(np.divide(image_new, self._merging_map[kk, :, :])*255.0)
+            # Only insert reconstructed (missing before values)
+            image_new = np.multiply(image_new,(1 - np.rint(mask_train)))+np.multiply(image, np.rint(mask_train))
+            image_new = image_new.astype(np.uint8)
             imageio.imsave('./data/reconstructed/'+comment+'_'+name+".png",im=image_new)
 
         t1 = time.time()
