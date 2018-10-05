@@ -33,15 +33,15 @@ i.e. decrease the magnitude of input inversly proportional to the increase in da
 
 if __name__ =="__main__":
     # Set parameters
-    patch_dims = [8,8]
+    patch_dims = [16,16]
     image_dims = [512,512]
-    steps = [2,2]
+    steps = [4,4]
     input_units = patch_dims[0]*patch_dims[1]
     learning_rate = 0.01
-    batch_size = 16
-    epoches = 1000
-    validation_step = 10
-    hiddent_units = 48
+    batch_size = 64
+    epoches = 200
+    validation_step = 2
+    hiddent_units = 64
     
     # Create dataloader
     dataLoader = DataLoader(patch_dims,image_dims,batch_size,steps)

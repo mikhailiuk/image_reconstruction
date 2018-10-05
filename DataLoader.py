@@ -22,7 +22,7 @@ class DataLoader:
         self._image_area = self._image_dims[0]*self._image_dims[1]
         self._patch_area = self._patch_dims[0]*self._patch_dims[1]
         # Set the image and patches
-        self._dataset = pd.read_csv('dataset.csv')
+        self._dataset = pd.read_csv('./data/dataset.csv')
         # Need map with weights to combine image together if use overlapping patches 
         self._merging_map = np.zeros(self._image_dims, dtype=float)
         # Order in whitch patches are fed to the network

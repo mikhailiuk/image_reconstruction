@@ -29,6 +29,10 @@ class Trainer:
 
         self._validation_error = []
         # Create tensorflow session and initialise graph and variables
+
+        # Set the optimiser in the neural network
+        self._loss_train, self._optimiser_train  = self._net.set_loss_optimiser()
+
         self._sess = tf.Session()
         self._sess.run(tf.global_variables_initializer())
         self._sess.run(tf.local_variables_initializer())
@@ -40,9 +44,6 @@ class Trainer:
         '''
         # Exctract image patches (split the image and validation masks into patches)
         dataLoader.extract_image_patches()
-
-        # Set the optimiser in the neural network
-        loss, optimiser  = self._net.set_loss_optimiser()
 
         # Iterate over epochs
         for epoch in range(1,self._epoches+1):
@@ -59,7 +60,8 @@ class Trainer:
                 # 3) Validation mask
                 # 4) Set training flag to true (i.e. do not applie validation
                 # mask and train on the clean data only)
-                _, loss_batch = self._sess.run([optimiser, loss], 
+                
+                _, loss_batch = self._sess.run([self._optimiser_train, self._loss_train], 
                                                 feed_dict={self._net._X:batch,
                                                            self._net._mask_train:btch_msk_tr,
                                                            self._net._mask_val:btch_msk_vl,
@@ -97,6 +99,8 @@ class Trainer:
                                                         self._net._mask_val:dataLoader._ptchs_msk_vl,
                                                         self._net._train_flag:False})
 
+
+        saved = False
         # If current loss is less than current minimal 
         if (loss_batch[0]<self._min_error):
             # Set min error to current error
@@ -104,9 +108,11 @@ class Trainer:
             # Set new best model
             self._net.save_best()
 
+            saved = True
+
         self._validation_error.append(loss_batch[0])
 
-        print('Epoch {}: validation loss: {}'.format(epoch,loss_batch[0]))
+        print('Epoch {}: validation loss: {}, saved: {}'.format(epoch,loss_batch[0], saved))
 
 
     def test(self,dataLoader):

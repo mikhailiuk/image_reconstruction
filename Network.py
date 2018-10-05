@@ -52,8 +52,9 @@ class Network:
         y_true = self._X
         # Mean squared error is computed for clean (not corrupted) values only
         loss = tf.divide(tf.reduce_sum(tf.pow(tf.multiply((y_pred-y_true),self._mask_train), 2)),tf.reduce_sum(self._mask_train))
-        optimiser = tf.train.GradientDescentOptimizer(learning_rate=self._learning_rate).minimize(loss)
-        
+        #optimiser = tf.train.GradientDescentOptimizer(learning_rate=self._learning_rate).minimize(loss) # 1e-08
+        optimiser = tf.train.AdamOptimizer(learning_rate=self._learning_rate,beta1=0.9,beta2=0.999,epsilon=1e-06,use_locking=False).minimize(loss)
+
         #optimiser = tf.train.MomentumOptimizer(learning_rate=self._learning_rate,momentum =0.99).minimize(loss)
         return loss, optimiser
 
