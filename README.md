@@ -2,7 +2,8 @@
 
 Real world data is noisy. Noise can come in the form of incorrect or missing values. This code is supplementary to an article [1], describing a way of filling missing values with auto-encoders. An auto-encoder is trained on noisy data with no reference values available for missing entries. The procedure is explained on the task of image reconstruction. If using the code please cite [2]
 
-[1] 
+[1] https://medium.com/@aliaksei.mikhailiuk/unsupervised-learning-for-data-interpolation-e259cf5dc957
+
 [2] Mikhailiuk A. and Faul A., 2018. "Deep Learning Applied to Seismic Data Interpolation". In: European Association of Geoscientists and Engineers (EAGE) 2018. IEEE 
 
 In order to run the code:
