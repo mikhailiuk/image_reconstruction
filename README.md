@@ -1,6 +1,6 @@
-# Image interpolation with auto-encoder.
+# Image interpolation with auto-encoder, TensorFlow implementation.
 
-Real world data is noisy. Noise can come in the form of incorrect or missing values. This code is supplementary to an article [1], describing a way of filling missing values with auto-encoders. An auto-encoder is trained on noisy data with no reference values available for missing entries. The procedure is explained on the task of image reconstruction. If using the code please cite [2]
+Real world data is noisy. Noise can come in the form of incorrect or missing values. This code is supplementary to an article [1], describing a way of filling missing values with auto-encoders. An auto-encoder is trained on noisy data with no reference values available for missing entries. The procedure is explained on the task of image reconstruction. If using the code please cite [2].
 
 [1] https://medium.com/@aliaksei.mikhailiuk/unsupervised-learning-for-data-interpolation-e259cf5dc957
 
