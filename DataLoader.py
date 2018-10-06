@@ -33,6 +33,9 @@ class DataLoader:
         self._ptchs_msk_tr = None
         # Numpy array with validation mask values
         self._ptchs_msk_vl = None
+
+        self._ptchs_msk_tst = None
+        self._ptchs_img_tst = None
         # Length of the dataset (number of patches)
         self._len_dataset = 0
         # Step - shift window for the patch (contains tupple x and y) 
@@ -53,15 +56,17 @@ class DataLoader:
         patches = []
         mask_patches_train = []
         mask_patches_val = []
-
+        mask_patches_test = []
+        patches_test = []
         # Create numpy array for the merging map - separate for every image
         self._merging_map = np.zeros((len(self._dataset),self._image_dims[0],self._image_dims[1]), dtype=float)
 
         for kk in range (0,len(self._dataset)):
             image= imageio.imread('./data/noisy_images/'+self._dataset['image_noisy'][kk]+'.bmp')
+            image_test = imageio.imread('./data/noisy_images/'+self._dataset['image_test'][kk]+'.bmp')
             mask_train = np.load('./data/masks_train/'+self._dataset['mask_train'][kk]+'.npy')
             mask_validation = np.load('./data/masks_validation/'+self._dataset['mask_validation'][kk]+'.npy')
-
+            mask_test = np.load('./data/masks_train/'+self._dataset['mask_test'][kk]+'.npy')
             # Iterate over the first dimension of the image with an x-step
             for ii in range(0,image.shape[0]-self._patch_dims[0]+1,self._step[0]):
                 # Ending index for the current patch extracted from the first fimensions
@@ -77,15 +82,19 @@ class DataLoader:
                     patches.append((image[ii:ii_end,jj:jj_end]).tolist())
                     mask_patches_train.append((mask_train[ii:ii_end,jj:jj_end]).tolist())
                     mask_patches_val.append((mask_validation[ii:ii_end,jj:jj_end]).tolist())
+                    mask_patches_test.append((mask_test[ii:ii_end,jj:jj_end]).tolist())
+                    patches_test.append((image_test[ii:ii_end,jj:jj_end]).tolist())
+
                     self._merging_map[kk, ii:ii_end, jj:jj_end] += 1.0
                     self._len_dataset +=1
 
 
         # Convert lists to arrays        
         patches = np.asarray(patches)
+        patches_test = np.asarray(patches_test)
         patches_mask_train = np.asarray(mask_patches_train)
         patches_mask_val = np.asarray(mask_patches_val)
-
+        patches_mask_test = np.asarray(mask_patches_test)
         # Fill the orderrred array
         self._ordered_arr = np.arange(self._len_dataset)
 
@@ -93,7 +102,8 @@ class DataLoader:
         self._ptchs = patches.reshape(int(self._len_dataset), self._patch_area)/255.0
         self._ptchs_msk_tr = patches_mask_train.reshape(int(self._len_dataset), self._patch_area)
         self._ptchs_msk_vl = patches_mask_val.reshape(int(self._len_dataset), self._patch_area)
-
+        self._ptchs_img_tst = patches_test.reshape(int(self._len_dataset), self._patch_area)/255.0
+        self._ptchs_msk_tst = patches_mask_test.reshape(int(self._len_dataset), self._patch_area)
         t1 = time.time()
         print("{} patches are exctracted. Time taken: {} s".format(int(self._len_dataset),t1-t0))
 
@@ -118,9 +128,9 @@ class DataLoader:
         t0 = time.time()
         cnt = 0
         for kk in range (0,len(self._dataset)):
-            image = imageio.imread('./data/noisy_images/'+self._dataset['image_noisy'][kk]+'.bmp')
-            name = self._dataset['image_noisy'][kk]+'_reconstructed'
-            mask_train = np.load('./data/masks_train/'+self._dataset['mask_train'][kk]+'.npy')
+            image = imageio.imread('./data/noisy_images/'+self._dataset['image_test'][kk]+'.bmp')
+            name = self._dataset['image_test'][kk]+'_reconstructed'
+            mask_train = np.load('./data/masks_train/'+self._dataset['mask_test'][kk]+'.npy')
             # Image to fill
             image_new = np.zeros(image.shape, dtype=float)
 

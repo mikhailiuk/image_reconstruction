@@ -1,2 +1,2 @@
-image_noisy,mask_train,mask_validation
-0_10,0_10,0_02
+image_noisy,mask_train,mask_validation,image_test,mask_test
+6_90,6_90,6_02,6_90,6_90

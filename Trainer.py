@@ -122,8 +122,8 @@ class Trainer:
 
 
         # To test - feed all patches and get only the output of the network decoder
-        g = self._sess.run([self._net._decoder_op], feed_dict={self._net._X:dataLoader._ptchs,
-                                                         self._net._mask_train:dataLoader._ptchs_msk_tr,
+        g = self._sess.run([self._net._decoder_op], feed_dict={self._net._X:dataLoader._ptchs_img_tst,
+                                                         self._net._mask_train:dataLoader._ptchs_msk_tst,
                                                          self._net._mask_val:dataLoader._ptchs_msk_vl,
                                                          self._net._train_flag:True})
         return g

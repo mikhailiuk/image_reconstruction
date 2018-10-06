@@ -53,7 +53,7 @@ class Network:
         # Mean squared error is computed for clean (not corrupted) values only
         loss = tf.divide(tf.reduce_sum(tf.pow(tf.multiply((y_pred-y_true),self._mask_train), 2)),tf.reduce_sum(self._mask_train))
         #optimiser = tf.train.GradientDescentOptimizer(learning_rate=self._learning_rate).minimize(loss) # 1e-08
-        optimiser = tf.train.AdamOptimizer(learning_rate=self._learning_rate,beta1=0.9,beta2=0.999,epsilon=1e-06,use_locking=False).minimize(loss)
+        optimiser = tf.train.AdamOptimizer(learning_rate=self._learning_rate,beta1=0.9,beta2=0.999,epsilon=1e-08,use_locking=False).minimize(loss)
 
         #optimiser = tf.train.MomentumOptimizer(learning_rate=self._learning_rate,momentum =0.99).minimize(loss)
         return loss, optimiser
@@ -65,7 +65,7 @@ class Network:
         y_pred = self._decoder_op
         y_true = self._X
         # Loss is computed only for the validation mask
-        loss_val = tf.divide(tf.reduce_sum(tf.pow(tf.multiply((y_pred-y_true),(1-self._mask_val)), 2)),tf.reduce_sum(1-self._mask_val))
+        loss_val = tf.sqrt(tf.divide(tf.reduce_sum(tf.pow(tf.multiply((y_pred-y_true),(1-self._mask_val)), 2)),tf.reduce_sum(1-self._mask_val)))
         return loss_val
 
 
@@ -80,10 +80,10 @@ class Network:
 
     def encoder(self, x):
         # Operation of the encoder (path through the tanh activation)
-        layer = tf.nn.tanh(tf.add(tf.matmul(x,self._weights['encoder']),self._biases['encoder']))
+        layer = tf.nn.relu(tf.add(tf.matmul(x,self._weights['encoder']),self._biases['encoder']))
         return layer
                             
     def decoder(self,x):
-        layer = tf.nn.sigmoid(tf.add(tf.matmul(x,self._weights['decoder']),self._biases['decoder']))
+        layer = tf.nn.relu(tf.add(tf.matmul(x,self._weights['decoder']),self._biases['decoder']))
         return layer  
         
