@@ -19,3 +19,4 @@ In order to run the code:
 
 2) Activate tensorflow
 3) python3 main.py
+4) Results are saved in ./data/reconstructed/
