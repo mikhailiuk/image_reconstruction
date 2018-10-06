@@ -8,7 +8,7 @@ Real world data is noisy. Noise can come in the form of incorrect or missing val
 
 In order to run the code:
 
-1) specify train, test and validation images in ./data/dataset.csv
+1) Specify train, test and validation images in ./data/dataset.csv
 	- can have multiple images (every line in the file corresponds to a new image)
 	- The format: 
 		- image_noisy: image to train on (e.g. ./data/noisy_images/0_70.bmp is simply 0_70), 0 - image number, 70 - amount of noise
