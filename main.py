@@ -17,16 +17,9 @@ deactivate
 
 
 TODO:
-+1) Test whether it works
-+2) Loss and optimiser - proerties of trainer or of the network
-+3) Noise mask
-+4) Validation mask
-+5) Test mask
-6) Multiple images
-+7) Better way of loading train and test images (see pytorch)
-8) Track progress
-+9) Overlapping patches
-10) When testing make sure that account for the fact that less informtaion is fed, 
+1) Multiple images
+2) Track progress
+3) When testing make sure that account for the fact that less informtaion is fed, 
 i.e. decrease the magnitude of input inversly proportional to the increase in data information
 '''
 
